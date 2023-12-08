@@ -1,0 +1,15 @@
+[package]
+name = "pyruve"
+version = "0.1.0"
+authors = ["Mikhail Dengin <denginm@gmail.com>"]
+license = "MIT"
+description = "Activate python virtual environment on directory change"
+repository = "https://github.com/insomnes/pyruve/"
+readme = "README.md"
+keywords = ["python", "virtualenv", "venv", "shell"]
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.75"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
