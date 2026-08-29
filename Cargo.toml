@@ -1,6 +1,6 @@
 [package]
 name = "pyruve"
-version = "0.2.0"
+version = "0.2.0-rc.1"
 authors = ["Mikhail Dengin <denginm@gmail.com>"]
 license = "MIT"
 description = "Automatically activate Python virtual environments on directory change"

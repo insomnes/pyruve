@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 - 2026-08-29
+## 0.2.0-rc.1 - 2026-08-29
 
 - Source activation scripts through shell-native commands instead of evaluating generated project paths.
 - Support paths containing spaces and apostrophes.
