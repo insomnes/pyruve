@@ -1,0 +1,51 @@
+name: Publish crate
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install stable Rust
+        run: |
+          rustup update stable --no-self-update
+          rustup default stable
+
+      - name: Validate tag and package version
+        run: |
+          crate_version=$(cargo metadata --no-deps --format-version 1 | jq --raw-output '.packages[] | select(.name == "pyruve") | .version')
+          test "$GITHUB_REF_NAME" = "v${crate_version}"
+
+      - name: Run tests
+        run: cargo test --locked
+
+      - name: Check package publication
+        run: cargo publish --dry-run --locked
+
+      - name: Authenticate with crates.io
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
+
+      - name: Publish crate
+        run: cargo publish --locked
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

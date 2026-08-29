@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install stable Rust
+        run: |
+          rustup update stable --no-self-update
+          rustup default stable
+          rustup component add rustfmt clippy
+
+      - name: Install shell test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes fish python3-venv shellcheck zsh
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run Rust tests
+        run: cargo test --locked
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+
+      - name: Check shell scripts
+        run: |
+          shellcheck -s bash src/shell/pyruve.bash tests/shell_integration.sh
+          fish -n src/shell/pyruve.fish
+          zsh -n src/shell/pyruve.zsh
+
+      - name: Run shell integration tests
+        run: |
+          cargo build --locked
+          tests/shell_integration.sh target/debug/pyruve
+
+      - name: Check package publication
+        run: cargo publish --dry-run --locked
