@@ -37,6 +37,33 @@ test -z "${VIRTUAL_ENV-}"
 '
 
 # shellcheck disable=SC2016
+env -u VIRTUAL_ENV bash --noprofile --norc -c '
+set -euo pipefail
+PROMPT_COMMAND="existing_command"
+eval "$(pyruve shell bash)"
+test "$PROMPT_COMMAND" = "existing_command; _pyruve_hook_on_prompt"
+
+PATH=/nonexistent
+_pyruve_hook_on_prompt
+cd "$PYRUVE_TEST_OUTSIDE"
+if _pyruve_hook_on_prompt 2>/dev/null; then
+    exit 1
+else
+    test $? -eq 127
+fi
+'
+
+# shellcheck disable=SC2016
+env -u VIRTUAL_ENV bash --noprofile --norc -c '
+set -euo pipefail
+declare -a PROMPT_COMMAND=(existing_command)
+eval "$(pyruve shell bash)"
+test "${PROMPT_COMMAND[0]}" = existing_command
+test "${PROMPT_COMMAND[1]}" = _pyruve_hook_on_prompt
+test "${#PROMPT_COMMAND[@]}" -eq 2
+'
+
+# shellcheck disable=SC2016
 env -u VIRTUAL_ENV fish -c '
 pyruve shell fish | source
 

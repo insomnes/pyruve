@@ -29,10 +29,23 @@ _pyruve_apply() {
 }
 
 _pyruve_hook_on_prompt() {
+    local pyruve_status
+
+    if [[ ${_PYRUVE_LAST_PWD-} == "$PWD" ]]; then
+        return 0
+    fi
+
     _pyruve_apply
+    pyruve_status=$?
+    if [[ $pyruve_status == 0 ]]; then
+        _PYRUVE_LAST_PWD=$PWD
+    fi
+    return "$pyruve_status"
 }
 
-_pyruve_apply
+if _pyruve_apply; then
+    _PYRUVE_LAST_PWD=$PWD
+fi
 
 if [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == "declare -a"* ]]; then
     _pyruve_hook_registered=false
