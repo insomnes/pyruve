@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0-rc.1 - 2026-08-29
+## 0.2.0 - 2026-08-29
 
 - Source activation scripts through shell-native commands instead of evaluating generated project paths.
 - Support paths containing spaces and apostrophes.
@@ -8,6 +8,7 @@
 - Handle non-UTF-8 directory names without panicking on Unix.
 - Avoid running the Bash hook again when `PWD` did not change.
 - Preserve scalar and array forms of Bash `PROMPT_COMMAND`.
+- Avoid duplicate Bash prompt hooks when the initializer is sourced more than once.
 - Add Tcsh support without replacing an existing `cwdcmd` alias.
 - Test all supported shells in Debian and Alpine CI containers.
 - Add `--help` and `--version` output.
