@@ -31,7 +31,7 @@ Then add one initializer to your shell configuration.
 Add this line to `.bashrc`:
 
 ```bash
-eval "$(pyruve shell bash)"
+source <(pyruve shell bash)
 ```
 
 ### Fish
