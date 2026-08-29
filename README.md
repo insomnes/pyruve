@@ -3,10 +3,12 @@
 `pyruve` automatically activates the nearest Python virtual environment when you change directories.
 It deactivates the environment after you leave its project tree.
 
-Supported shells on Unix-like systems:
+`pyruve` supports POSIX operating systems with the standard `<venv>/bin` layout.
+It integrates with these shells:
 
 - Bash
 - Fish
+- Tcsh
 - Zsh
 
 Windows shells are not supported.
@@ -48,6 +50,15 @@ Add this line to `.zshrc`:
 eval "$(pyruve shell zsh)"
 ```
 
+### Tcsh
+
+Add these lines to `.tcshrc`:
+
+```tcsh
+eval "`pyruve shell tcsh`"
+_pyruve_apply
+```
+
 Restart the shell after installation or upgrade.
 
 ## Behavior
@@ -69,6 +80,8 @@ Moving from an outer project into a nested project activates the nested environm
 
 Paths containing spaces or apostrophes are supported.
 Activation paths containing newline characters are rejected.
+Returned activation paths are sourced directly and are never passed to `eval`.
+Tcsh uses `eval` only to invoke the fixed `deactivate` alias created by `activate.csh`.
 
 ## Configuration
 
@@ -98,11 +111,10 @@ The tool verifies the script path, but it does not inspect or sandbox script con
 
 ## Compatibility
 
-The repository tests Bash, Fish, and Zsh with real Python environments.
+The repository tests Bash, Fish, Tcsh, and Zsh with real Python environments.
 CI builds the crate with stable Rust; no minimum supported Rust version is promised.
 
 Other shells need explicit integrations because environment mutation is shell-specific.
-Tcsh could use the existing action protocol with a small adapter.
 Nushell and PowerShell need structured environment updates, so they are not syntax-only additions.
 
 ## Development
@@ -115,7 +127,7 @@ cargo test --locked
 cargo clippy --all-targets --locked -- -D warnings
 ```
 
-The shell integration test also requires Bash, Fish, Zsh, and `python3-venv`:
+The shell integration test also requires Bash, Fish, Tcsh, Zsh, and `python3-venv`:
 
 ```console
 cargo build --locked

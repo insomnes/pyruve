@@ -15,8 +15,8 @@ const NOOP_EXIT_CODE: u8 = 11;
 const HELP: &str = "pyruve automatically activates Python virtual environments.
 
 Usage:
-  pyruve shell <bash|fish|zsh>
-  pyruve hook <bash|fish|zsh>
+  pyruve shell <bash|fish|tcsh|zsh>
+  pyruve hook <bash|fish|tcsh|zsh>
   pyruve --help
   pyruve --version
 
@@ -28,6 +28,7 @@ The 'hook' command is an internal interface used by that code.
 enum Shell {
     Bash,
     Fish,
+    Tcsh,
     Zsh,
 }
 
@@ -59,6 +60,7 @@ fn shell(args: &[OsString]) -> AppResult<ExitCode> {
     let shell_text = match shell {
         Shell::Bash => include_str!("shell/pyruve.bash"),
         Shell::Fish => include_str!("shell/pyruve.fish"),
+        Shell::Tcsh => include_str!("shell/pyruve.tcsh"),
         Shell::Zsh => include_str!("shell/pyruve.zsh"),
     };
 
@@ -98,6 +100,7 @@ fn parse_shell_argument(args: &[OsString]) -> AppResult<Shell> {
     match args[1].to_str() {
         Some("bash") => Ok(Shell::Bash),
         Some("fish") => Ok(Shell::Fish),
+        Some("tcsh") => Ok(Shell::Tcsh),
         Some("zsh") => Ok(Shell::Zsh),
         Some(shell) => Err(invalid_input(format!("unsupported shell: {shell}"))),
         None => Err(invalid_input("shell name is not valid UTF-8")),
@@ -108,6 +111,7 @@ fn activation_script(venv: &Path, shell: Shell) -> PathBuf {
     match shell {
         Shell::Bash | Shell::Zsh => venv.join("bin/activate"),
         Shell::Fish => venv.join("bin/activate.fish"),
+        Shell::Tcsh => venv.join("bin/activate.csh"),
     }
 }
 
@@ -148,6 +152,10 @@ mod tests {
         assert_eq!(
             activation_script(venv, Shell::Fish),
             venv.join("bin/activate.fish")
+        );
+        assert_eq!(
+            activation_script(venv, Shell::Tcsh),
+            venv.join("bin/activate.csh")
         );
     }
 

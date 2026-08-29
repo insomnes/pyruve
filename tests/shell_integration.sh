@@ -81,6 +81,33 @@ test -z "$VIRTUAL_ENV"
 '
 
 # shellcheck disable=SC2016
+env -u VIRTUAL_ENV tcsh -f -c '
+set prompt = "% "
+eval "`pyruve shell tcsh`"
+_pyruve_apply
+
+cd "$PYRUVE_TEST_PROJECT/src"
+if ( "$VIRTUAL_ENV" != "$PYRUVE_TEST_PROJECT/.venv" ) exit 1
+
+cd "$PYRUVE_TEST_NESTED_PROJECT/src"
+if ( "$VIRTUAL_ENV" != "$PYRUVE_TEST_NESTED_PROJECT/.venv" ) exit 1
+
+cd "$PYRUVE_TEST_OUTSIDE"
+if ( $?VIRTUAL_ENV ) exit 1
+'
+
+# shellcheck disable=SC2016
+env -u VIRTUAL_ENV tcsh -f -c '
+set pyruve_test_cwdcmd_calls = 0
+alias cwdcmd '@ pyruve_test_cwdcmd_calls++'
+eval "`pyruve shell tcsh`"
+eval "`pyruve shell tcsh`"
+
+cd "$PYRUVE_TEST_OUTSIDE"
+if ( $pyruve_test_cwdcmd_calls != 1 ) exit 1
+'
+
+# shellcheck disable=SC2016
 env -u VIRTUAL_ENV zsh --no-rcs -c '
 set -e
 eval "$(pyruve shell zsh)"
