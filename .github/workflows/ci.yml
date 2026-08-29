@@ -73,9 +73,10 @@ jobs:
           MATRIX_IMAGE: ${{ matrix.image }}
         run: |
           docker run --rm \
+            --env CARGO_TARGET_DIR=/target \
             --env MATRIX_FAMILY \
             --volume "$GITHUB_WORKSPACE:/work:ro" \
-            --tmpfs /work/target:exec \
+            --tmpfs /target:exec \
             --workdir /work \
             "$MATRIX_IMAGE" \
             sh -ec '
@@ -87,5 +88,5 @@ jobs:
               fi
 
               /usr/local/cargo/bin/cargo build --locked
-              tests/shell_integration.sh target/debug/pyruve
+              tests/shell_integration.sh /target/debug/pyruve
             '
