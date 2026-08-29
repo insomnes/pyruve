@@ -112,6 +112,7 @@ The tool verifies the script path, but it does not inspect or sandbox script con
 ## Compatibility
 
 The repository tests Bash, Fish, Tcsh, and Zsh with real Python environments.
+CI runs the shell integration suite in Debian Bookworm and Alpine 3.24 containers.
 CI builds the crate with stable Rust; no minimum supported Rust version is promised.
 
 Other shells need explicit integrations because environment mutation is shell-specific.

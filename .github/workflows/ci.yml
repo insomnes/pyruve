@@ -27,7 +27,7 @@ jobs:
       - name: Install shell test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes fish python3-venv shellcheck zsh
+          sudo apt-get install --yes fish shellcheck tcsh zsh
 
       - name: Check formatting
         run: cargo fmt --all -- --check
@@ -42,12 +42,50 @@ jobs:
         run: |
           shellcheck -s bash src/shell/pyruve.bash tests/shell_integration.sh
           fish -n src/shell/pyruve.fish
+          tcsh -n src/shell/pyruve.tcsh
           zsh -n src/shell/pyruve.zsh
-
-      - name: Run shell integration tests
-        run: |
-          cargo build --locked
-          tests/shell_integration.sh target/debug/pyruve
 
       - name: Check package publication
         run: cargo publish --dry-run --locked
+
+  shell-integration:
+    name: Shell integration (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Debian Bookworm
+            family: debian
+            image: rust:1.96-bookworm
+          - name: Alpine 3.24
+            family: alpine
+            image: rust:1.96-alpine3.24
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Test supported shells
+        env:
+          MATRIX_FAMILY: ${{ matrix.family }}
+          MATRIX_IMAGE: ${{ matrix.image }}
+        run: |
+          docker run --rm \
+            --env MATRIX_FAMILY \
+            --volume "$GITHUB_WORKSPACE:/work:ro" \
+            --tmpfs /work/target:exec \
+            --workdir /work \
+            "$MATRIX_IMAGE" \
+            sh -ec '
+              if [ "$MATRIX_FAMILY" = alpine ]; then
+                apk add --no-cache bash fish python3 py3-pip tcsh zsh
+              else
+                apt-get -qq update
+                DEBIAN_FRONTEND=noninteractive apt-get -qq install -y fish python3-venv tcsh zsh
+              fi
+
+              /usr/local/cargo/bin/cargo build --locked
+              tests/shell_integration.sh target/debug/pyruve
+            '
