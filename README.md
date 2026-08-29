@@ -21,6 +21,14 @@ Install the current release from crates.io:
 cargo install pyruve
 ```
 
+On glibc-based Linux, an optional static local build can reduce process startup overhead:
+
+```console
+RUSTFLAGS='-C target-feature=+crt-static' cargo install --force pyruve
+```
+
+The static build is platform-specific. Use the standard installation command on other systems.
+
 Ensure that Cargo's binary directory is in `PATH`.
 It is normally `$HOME/.cargo/bin`.
 
