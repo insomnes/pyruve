@@ -60,8 +60,9 @@ if [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == "declare -a"* ]]; then
     fi
     unset _pyruve_hook_registered _pyruve_prompt_command
 else
-    case ";${PROMPT_COMMAND-};" in
-        *";_pyruve_hook_on_prompt;"*) ;;
-        *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND}; }_pyruve_hook_on_prompt" ;;
-    esac
+    if [[ ";${PROMPT_COMMAND-};" =~ \;[[:space:]]*_pyruve_hook_on_prompt[[:space:]]*\; ]]; then
+        :
+    else
+        PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND}; }_pyruve_hook_on_prompt"
+    fi
 fi

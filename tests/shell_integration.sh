@@ -42,6 +42,8 @@ set -euo pipefail
 PROMPT_COMMAND="existing_command"
 eval "$(pyruve shell bash)"
 test "$PROMPT_COMMAND" = "existing_command; _pyruve_hook_on_prompt"
+eval "$(pyruve shell bash)"
+test "$PROMPT_COMMAND" = "existing_command; _pyruve_hook_on_prompt"
 
 PATH=/nonexistent
 _pyruve_hook_on_prompt
